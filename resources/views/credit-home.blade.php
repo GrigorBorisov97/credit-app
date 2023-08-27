@@ -139,7 +139,7 @@
         });
 
         function takeCredit() {
-            fetch('/api/credit-new', {
+            fetch('./api/credit-new', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -154,11 +154,11 @@
             })
         }
 
-        function creditPayment() {
+        async function creditPayment() {
             let userPayment = document.querySelector('#userPayment').value;
             let paymentAmount = document.querySelector('#paymentAmount').value;
 
-            fetch('/api/credit-pay', {
+            const ajax = await fetch('./api/credit-pay', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -168,6 +168,11 @@
                     paymentAmount
                 })
             })
+
+            if (ajax.status === 'success') {
+                alert('Payment successful');
+                window.location.reload();
+            }
         }
     </script>
 </body>
