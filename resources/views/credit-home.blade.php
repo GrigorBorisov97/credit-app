@@ -20,7 +20,7 @@
     <div class="container">
         <div class="row">
             <div class="col pt-4">
-                <h2>Credit app</h2>
+                <h2>New Credit</h2>
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1">@</span>
                     <input id="userName" type="text" class="form-control" placeholder="Username" aria-label="Username"
@@ -30,7 +30,7 @@
                 <div class="input-group mb-3">
                     <input type="number" value="10000" max="80000" class="form-control" id="creditAmount"
                         aria-label="Amount (to the nearest dollar)">
-                    <span class="input-group-text">.00 лв</span>
+                    <span class="input-group-text">.00 BGN</span>
                 </div>
 
                 <label for="customRange1" class="form-label">Return period - in <span id="returnPeriod">60</span>
@@ -44,28 +44,33 @@
             </div>
         </div>
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Return period</th>
-                    <th scope="col">Monthly Tax</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach($credits as $credit): ?>
+        <div class="col pt-4">
+            <h2>Credit listing</h2>
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <th scope="row"><?= sprintf('%06s', $credit['id']) ?></th>
-                        <td><?= $credit['name'] ?></td>
-                        <td><?= $credit['amount'] ?> лв</td>
-                        <td><?= $credit['return_period'] ?> months</td>
-                        <td><?= $credit['monthly_tax'] ?> лв</td>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Credit Amount</th>
+                        <th scope="col">Remaining Amount</th>
+                        <th scope="col">Return period</th>
+                        <th scope="col">Monthly Tax</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach($credits as $credit): ?>
+                        <tr>
+                            <th scope="row"><?= sprintf('%06s', $credit['id']) ?></th>
+                            <td><?= $credit['name'] ?></td>
+                            <td><?= $credit['credit_amount'] ?> BGN</td>
+                            <td><?= $credit['refund_amount'] ?> BGN</td>
+                            <td><?= $credit['return_period'] ?> months</td>
+                            <td><?= $credit['monthly_tax'] ?> BGN</td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 
         <div class="col pt-4">
                 <h2>Charge credit</h2>
@@ -73,14 +78,14 @@
                     <span class="input-group-text" id="basic-addon1">@</span>
                     <select id="userPayment" onchange="updatePaymentField(event.target.value)" class="form-select" aria-label="Default select example">
                         <?php foreach($credits as $credit): ?>
-                            <option value="<?= $credit['id'] ?>"><?= $credit['name'] ?></option>
+                            <option value="<?= $credit['id'] ?>"><?= $credit['name'] ?> (<?= $credit['refund_amount'] ?> BGN)</option>
                         <?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="input-group mb-3">
-                    <span class="input-group-text">лв</span>
-                    <input type="number" class="form-control" id="paymentAmount"
+                    <span class="input-group-text">Payment amount</span>
+                    <input type="number" value="<?= $credits[0]['monthly_tax'] ?>" class="form-control" id="paymentAmount"
                         aria-label="Amount (to the nearest dollar)">
                 </div>
 
@@ -114,8 +119,8 @@
             totalAmount = creditAmount + (monthlyTax * returnPeriod);
             monthlyPayment = totalAmount / returnPeriod;
 
-            document.querySelector('#monthlyPayment').innerHTML = monthlyPayment.toFixed(2) + 'лв';
-            document.querySelector('#totalAmount').innerHTML = totalAmount.toFixed(2) + 'лв';
+            document.querySelector('#monthlyPayment').innerHTML = monthlyPayment.toFixed(2) + ' BGN';
+            document.querySelector('#totalAmount').innerHTML = totalAmount.toFixed(2) + ' BGN';
         };
         calcMonthlyPayment();
 
@@ -138,8 +143,8 @@
             calcMonthlyPayment()
         });
 
-        function takeCredit() {
-            fetch('./api/credit-new', {
+        async function takeCredit() {
+            const ajax = await fetch('./api/credit-new', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -152,6 +157,13 @@
                     userName
                 })
             })
+
+            const response = await ajax.json();
+
+            alert(response.message);
+            if (response.status === 'success') {
+                window.location.reload();
+            }
         }
 
         async function creditPayment() {
@@ -167,10 +179,11 @@
                     userPayment,
                     paymentAmount
                 })
-            })
+            });
+            const response = await ajax.json();
 
-            if (ajax.status === 'success') {
-                alert('Payment successful');
+            alert(response.message);
+            if (response.status === 'success') {
                 window.location.reload();
             }
         }

@@ -11,6 +11,6 @@ class Utils extends Controller
         $monthly_tax = (float) $credit / 100 * 7.9 / 12;
         $total_amount = $credit + ((float) $monthly_tax * (int) $return_period);
 
-        return $total_amount === $pay_amount;
+        return $total_amount == $pay_amount;
     }
 }

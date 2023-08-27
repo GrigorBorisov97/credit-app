@@ -10,8 +10,9 @@ class Credits extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'amount',
+        'user_id',
+        'credit_amount',
+        'refund_amount',
         'monthly_tax',
         'return_period',
     ];
