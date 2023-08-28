@@ -40,7 +40,7 @@ class CreditController extends Controller
         if ($credit_limit_exceeded) {
             return response()->json([
                 'status' => 'error',
-                'message' => "Credit limit 80000 exceeded!",
+                'message' => "Your credits limit 80000 exceeded!",
             ]);
         }
 

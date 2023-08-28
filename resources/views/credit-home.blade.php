@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="input-group mb-3">
-                    <input type="number" value="10000" max="80000" class="form-control" id="creditAmount"
+                    <input onkeyup="calcMonthlyPayment(event.target.value)" type="number" value="10000" max="80000" class="form-control" id="creditAmount"
                         aria-label="Amount (to the nearest dollar)">
                     <span class="input-group-text">.00 BGN</span>
                 </div>
@@ -110,9 +110,14 @@
             document.querySelector('#paymentAmount').value = credits.find(el => el.id == id).monthly_tax;
         }
 
-        function calcMonthlyPayment() {
+        function calcMonthlyPayment(input_value = false) {
             returnPeriod = parseInt(document.querySelector('#returnPeriodRange').value);
-            creditAmount = parseInt(document.querySelector('#creditAmount').value);
+            if (input_value) {
+                creditAmount = parseInt(input_value);
+            } else {
+                creditAmount = parseInt(document.querySelector('#creditAmount').value);
+            }
+
             totalAmount = parseInt(document.querySelector('#creditAmount').value);
 
             monthlyTax = creditAmount / 100 * 7.9 / 12;
@@ -133,15 +138,6 @@
             userName = event.target.value;
         })
 
-        document.querySelector('#creditAmount').addEventListener('change', (event) => {
-            if (parseInt(event.target.value) > 80000)
-                document.querySelector('#creditAmount').value = 80000;
-
-            if (parseInt(event.target.value) < 1)
-                document.querySelector('#creditAmount').value = 1;
-
-            calcMonthlyPayment()
-        });
 
         async function takeCredit() {
             const ajax = await fetch('./api/credit-new', {

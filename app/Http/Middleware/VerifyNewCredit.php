@@ -35,7 +35,7 @@ class VerifyNewCredit
         if ($payload['creditAmount'] < 1 || $payload['creditAmount'] > 80000) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Falsy data for credit amount',
+                'message' => 'Credit should not exceed 80000',
             ]);
         }
         
